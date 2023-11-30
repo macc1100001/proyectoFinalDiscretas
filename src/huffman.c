@@ -36,10 +36,13 @@ bool CrearFrecuencias(const char* nombreArchivo){
 
 int main(int argc, char** argv){	
 	int c;
-	while((c = getopt(argc, argv, "v")) != -1){
+	while((c = getopt(argc, argv, "dv")) != -1){
 		switch(c){
 			case 'v':
 				verboseFlag = true;
+				break;
+			case 'd':
+				decodeFlag = true;
 				break;
 			default:
 				break;
@@ -58,6 +61,17 @@ int main(int argc, char** argv){
 	if(!CrearFrecuencias(argv[optind])){
 		fprintf(stderr, "Error\n");
 		return EXIT_FAILURE;
+	}
+	// parte decodificadora se hace aqui
+	if(decodeFlag){
+		if(verboseFlag)
+			printf("Decodificador\n");
+	}
+	else{
+		// aqui se hace la parte codificadora, que es la opcion por defecto
+		if(verboseFlag)
+			printf("Codificador\n");
+	
 	}
 	
 	return EXIT_SUCCESS;
