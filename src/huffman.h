@@ -6,8 +6,7 @@
 #include<stdlib.h>
 #include<unistd.h>
 
-bool verboseFlag = false;
-bool decodeFlag = false;
+bool verboseFlag = false, decompressFlag = false;
 
 void HuffmanCodificador();
 void HuffmanDecodificador();
