@@ -1,4 +1,5 @@
 *.tgz
 huffman
 codlineal
+injectError
 *.txt
