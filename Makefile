@@ -13,7 +13,7 @@ ifeq ($(DEBUG), 1)
 CFLAGS += -g -DDEBUG
 endif
 
-all: huffman codlineal
+all: huffman codlineal injectError
 
 huffman: huffman.c
 	$(CC) $(CFLAGS) -o $@ $^ $(LDFLAGS)
@@ -21,12 +21,8 @@ huffman: huffman.c
 codlineal: codlineal.c
 	$(CC) $(CFLAGS) -o $@ $^ $(LDFLAGS)
 	
-
-$(EXEC): $(OBJS)
+injectError: injectError.c
 	$(CC) $(CFLAGS) -o $@ $^ $(LDFLAGS)
-	
-$(OBJDIR)/%.o: $(SRCDIR)/%.c
-	$(CC) -o $@ -c $(CFLAGS) $^
 
 .PHONY: clean cleanest init
 

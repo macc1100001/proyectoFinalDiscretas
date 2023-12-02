@@ -56,6 +56,8 @@ int main(int argc, char** argv){
 		
 	if(!argv[optind]){
 		fprintf(stderr,"Uso: %s [OPCIONES] ARCHIVO\n\
+El argumento ARCHIVO es el archivo a comprimir. \
+El programa por defecto funciona en modo compresion\n\
 Opciones:\n\
 -d	El programa se ejecuta en modo de descompresion\n\
 -v	El programa escupe mas informacion en la consola\n", argv[0]);
