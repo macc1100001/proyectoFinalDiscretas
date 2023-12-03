@@ -1,7 +1,13 @@
 #include "huffman.h"
 
-void HuffmanCodificador(){}
-void HuffmanDecodificador(){}
+void HuffmanCodificador(const char* nombreArchivo){
+	// TODO: aqui se hace la parte codificadora, que es la opcion por defecto
+}
+
+void HuffmanDecodificador(const char* nombreArchivo){
+	// TODO: parte decodificadora se hace aqui
+}
+
 bool CrearFrecuencias(const char* nombreArchivo){
 	FILE* fd = fopen(nombreArchivo, "r");
 	if(!fd){
@@ -12,11 +18,8 @@ bool CrearFrecuencias(const char* nombreArchivo){
 	unsigned char buff;
 	size_t ret;
 	// contamos todos los caracteres
-	for(;(ret = fread(&buff, 1, 1, fd) == 1);){
-		if(verboseFlag)
-			printf("buff = %x\n", buff);
+	while((ret = fread(&buff, 1, 1, fd)) == 1)
 		++freqs[buff];
-	}
 	fclose(fd);
 	// por defecto el nombre del archivo de frecuencias es "freqs.txt"
 	FILE* freqsFile = fopen("freqs.txt", "a+");
@@ -24,8 +27,7 @@ bool CrearFrecuencias(const char* nombreArchivo){
 		fprintf(stderr, "Error al crear el archivo de frecuencias\n");
 		return false;
 	}
-	if(verboseFlag)
-		printf("\n");
+	// contamos el numero total de bytes
 	unsigned int totalBytes = 0;
 	for(int i = 0; i < 256; ++i){
 		if(verboseFlag)
@@ -59,26 +61,27 @@ int main(int argc, char** argv){
 El argumento ARCHIVO es el archivo a comprimir. \
 El programa por defecto funciona en modo compresion\n\
 Opciones:\n\
--d	El programa se ejecuta en modo de descompresion\n\
+-d	El programa se ejecuta en modo de descompresion. \
+En este caso el argumento ARCHIVO es el nombre del archivo a descomprimir.\n\
 -v	El programa escupe mas informacion en la consola\n", argv[0]);
 		return EXIT_FAILURE;
 	}
 	
-	// procesamos el archivo para contar los bytes y crear un archivo de frecuencias
-	if(!CrearFrecuencias(argv[optind]))
-		return EXIT_FAILURE;
 	
 	if(decompressFlag){
 		if(verboseFlag)
 			printf("Descompresion\n");
-		// TODO: parte decodificadora se hace aqui
-		
+		// Aplicamos la compresion Huffman
+		HuffmanDecodificador(argv[optind]);		
 	}
 	else{
 		if(verboseFlag)
 			printf("Compresion\n");
-		// TODO: aqui se hace la parte codificadora, que es la opcion por defecto
-	
+		// procesamos el archivo para contar los bytes y crear un archivo de frecuencias
+		if(!CrearFrecuencias(argv[optind]))
+			return EXIT_FAILURE;
+		// Aplicamos la compresion Huffman
+		HuffmanCodificador(argv[optind]);
 	}
 	
 	return EXIT_SUCCESS;

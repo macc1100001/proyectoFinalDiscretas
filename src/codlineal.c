@@ -1,5 +1,12 @@
 #include"codlineal.h"
 
+void CodificadorLineal(const char* nombreArchivo){
+	//TODO: Aqui la parte de codificacion
+}
+void DecodificadorLineal(const char* nombreArchivo){
+	//TODO: Aqui la parte de decodificacion
+}
+
 int main(int argc, char** argv){
 	int c;
 	while((c = getopt(argc, argv, "dv")) != -1){
@@ -25,12 +32,12 @@ Opciones:\n\
 	if(decodeFlag){
 		if(verboseFlag)
 			printf("Decodificador\n");
-		//TODO: Aqui la parte de decodificacion
+		DecodificadorLineal(argv[optind]);
 	}
 	else{
 		if(verboseFlag)	
 			printf("Codificador\n");
-		//TODO: Aqui la parte de codificacion
+		CodificadorLineal(argv[optind]);
 		// la salida del codificador es un archivo "Entrada.bin"
 	}
 	
