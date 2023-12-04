@@ -6,7 +6,7 @@ EXEC =
 SRCDIR = ./src
 OBJDIR = ./obj
 VPATH = $(SRCDIR)
-OBJ_NAMES = huffman.o codlineal.o
+OBJ_NAMES = 
 OBJS = $(addprefix $(OBJDIR)/, $(OBJ_NAMES))
 
 ifeq ($(DEBUG), 1)
@@ -27,7 +27,7 @@ injectError: injectError.c
 .PHONY: clean cleanest init
 
 clean:
-	rm -f huffman codlineal
+	rm -f huffman codlineal injectError
 	
 cleanest: clean
 	rm -f $(OBJDIR)/*.o
