@@ -1,11 +1,16 @@
 #include "huffman.h"
 
-void HuffmanCodificador(const char* nombreArchivo){
+bool HuffmanCodificador(const char* nombreArchivo){
 	// TODO: aqui se hace la parte codificadora, que es la opcion por defecto
+	// Esta funcion tiene que devolver false, si falla
+	// y true al final si todo se ejecuto de manera correcta, como ejemplo 
+	// esta la funcion CrearFrecuencias
 }
 
-void HuffmanDecodificador(const char* nombreArchivo){
+bool HuffmanDecodificador(const char* nombreArchivo){
 	// TODO: parte decodificadora se hace aqui
+	// Lo mismo que la funcion de arriba, se debe de devolver un booleano
+	// indicando si se pudo ejecutar de manera correcta el programa
 }
 
 bool CrearFrecuencias(const char* nombreArchivo){
@@ -22,7 +27,7 @@ bool CrearFrecuencias(const char* nombreArchivo){
 		++freqs[buff];
 	fclose(fd);
 	// por defecto el nombre del archivo de frecuencias es "freqs.txt"
-	FILE* freqsFile = fopen("freqs.txt", "a+");
+	FILE* freqsFile = fopen("freqs.txt", "w+");
 	if(!freqsFile){
 		fprintf(stderr, "Error al crear el archivo de frecuencias\n");
 		return false;
@@ -72,16 +77,20 @@ En este caso el argumento ARCHIVO es el nombre del archivo a descomprimir.\n\
 		if(verboseFlag)
 			printf("Descompresion\n");
 		// Aplicamos la compresion Huffman
-		HuffmanDecodificador(argv[optind]);		
+		if(!HuffmanDecodificador(argv[optind]))
+			return EXIT_FAILURE;
 	}
 	else{
 		if(verboseFlag)
 			printf("Compresion\n");
+		// Solamente creamos el archivo de frecuencias si el programa
+		// se ejecuta en modo compresion
 		// procesamos el archivo para contar los bytes y crear un archivo de frecuencias
 		if(!CrearFrecuencias(argv[optind]))
 			return EXIT_FAILURE;
 		// Aplicamos la compresion Huffman
-		HuffmanCodificador(argv[optind]);
+		if(!HuffmanCodificador(argv[optind]))
+			return EXIT_FAILURE;
 	}
 	
 	return EXIT_SUCCESS;

@@ -8,7 +8,7 @@
 
 bool decodeFlag = false, verboseFlag = false;
 
-void CodificadorLineal(const char*);
-void DecodificadorLineal(const char*);
+bool CodificadorLineal(const char*, char*);
+bool DecodificadorLineal(const char*);
 
 #endif

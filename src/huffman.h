@@ -8,8 +8,8 @@
 
 bool verboseFlag = false, decompressFlag = false;
 
-void HuffmanCodificador(const char*);
-void HuffmanDecodificador(const char*);
+bool HuffmanCodificador(const char*);
+bool HuffmanDecodificador(const char*);
 bool CrearFrecuencias(const char*);
 
 
