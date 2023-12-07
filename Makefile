@@ -1,5 +1,5 @@
 CC = gcc
-DEBUG = 
+DEBUG = 1
 CFLAGS = -Wall
 LDFLAGS = 
 EXEC = 

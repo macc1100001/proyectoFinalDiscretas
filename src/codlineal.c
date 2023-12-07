@@ -1,5 +1,36 @@
 #include"codlineal.h"
 
+unsigned char peso(unsigned char a){
+	unsigned char peso = 0, tmp = a;
+	while(tmp > 0){
+		if(tmp & 1) ++peso;
+		tmp = tmp >> 1;
+	}
+	return peso;
+}
+
+void construirH(unsigned char* h, int n, int k){
+	// primera parte de la matriz H
+	//unsigned char val = 128;
+	for(int i = 0; i < n; ++i){
+		h[i] = i+1;
+	}
+}
+
+int* calcularFilas(int r, int n){
+	int *numt, k;
+	numt = calloc(r, sizeof(int));
+	for(int j = 0; j < r; ++j){
+		//numt = 0;
+		k = 0;
+		for(int i = n; i > 0; --i){
+			numt[j] |= ((i >> j) & 1) << k++;
+		}
+		//printf("numt = %d\n", numt);
+	}
+	return numt;
+}
+
 bool CodificadorLineal(const char* nombreArchivoEntrada, char* nombreArchivoSalida){
 	//TODO: Aqui la parte de codificacion
 	// El archivo que esta funcion saca, siempre se llama "Entrada.bin"
@@ -73,6 +104,28 @@ Opciones:\n\
 	}
 	
 	char* nombreArchivoSalida = "Entrada.bin";
+	
+	#ifdef DEBUG
+	printf("peso de %d: %d\n", 3, peso(3));
+	printf("peso de %d: %d\n", 4, peso(4));
+	printf("peso de %d: %d\n", 5, peso(5));
+	printf("peso de %d: %d\n", 7, peso(7));
+	printf("peso de %d: %d\n", 8, peso(8));
+	printf("peso de %d: %d\n", 252, peso(252));
+	int n = 10, k = 4;
+	unsigned char H[n];
+	memset(H, 0, n);
+	// aqui se construye la matriz identidad en H
+	// escogemos k = 8, n = 16
+	construirH(H, n, k);
+	for(int i = 0; i < 10; ++i)printf("h[%d] = %d\n", i, H[i]);
+	
+	
+
+	
+	return EXIT_SUCCESS;
+	
+	#endif
 	
 	if(decodeFlag){
 		if(verboseFlag)
