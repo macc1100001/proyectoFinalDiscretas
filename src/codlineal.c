@@ -10,8 +10,6 @@ unsigned char peso(unsigned char a){
 }
 
 void construirH(unsigned char* h, int n, int k){
-	// primera parte de la matriz H
-	//unsigned char val = 128;
 	for(int i = 0; i < n; ++i){
 		h[i] = i+1;
 	}
@@ -21,12 +19,10 @@ int* calcularFilas(int r, int n){
 	int *numt, k;
 	numt = calloc(r, sizeof(int));
 	for(int j = 0; j < r; ++j){
-		//numt = 0;
 		k = 0;
 		for(int i = n; i > 0; --i){
 			numt[j] |= ((i >> j) & 1) << k++;
 		}
-		//printf("numt = %d\n", numt);
 	}
 	return numt;
 }
@@ -56,10 +52,6 @@ bool CodificadorLineal(const char* nombreArchivoEntrada, char* nombreArchivoSali
 		Necesitamos que delta >= 3.
 	*/
 	// Construimos H, la matriz verificadora
-	
-	//char* = calloc(); ??
-	
-	// Calculamos Hz'
 	
 	//operaciones de lectura para operar sobre el archivo
 	
