@@ -16,16 +16,15 @@ unsigned char peso(unsigned char a){
 }
 */
 
-int* calcularFilas(int r, int n){
-	int *numt, k;
-	numt = calloc(r, sizeof(int));
+// calcula el valor entero correspondiente a la fila de la matriz H en binario
+void calcularFilas(int* numt, int r, int n){
+	int k;
+	memset(numt, 0, sizeof(int)*r);
 	for(int j = 0; j < r; ++j){
 		k = 0;
-		for(int i = n; i > 0; --i){
+		for(int i = n; i > 0; --i)
 			numt[j] |= ((i >> j) & 1) << k++;
-		}
 	}
-	return numt;
 }
 
 bool CodificadorLineal(const char* nombreArchivoEntrada, char* nombreArchivoSalida){
@@ -105,17 +104,6 @@ Opciones:\n\
 	printf("peso de %d: %d\n", 7, peso(7));
 	printf("peso de %d: %d\n", 8, peso(8));
 	printf("peso de %d: %d\n", 252, peso(252));
-	int n = 10, k = 4;
-	unsigned char H[n];
-	memset(H, 0, n);
-	// aqui se construye la matriz identidad en H
-	// escogemos k = 8, n = 16
-	construirH(H, n, k);
-	for(int i = 0; i < 10; ++i)printf("h[%d] = %d\n", i, H[i]);
-	
-	
-
-	
 	return EXIT_SUCCESS;
 	
 	#endif
