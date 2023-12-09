@@ -1,5 +1,12 @@
 #include"codlineal.h"
 
+/*
+	TODO: En la descodificacion y correccion de errores
+	no se recupera del todo el archivo si el error ocurre endif
+	el bit 7 de cada codeword, porque no es parte de ella y no se sabe como interpretarla.
+	Idea para solucionarlo, no incluir el bit mas significativo del byte.
+*/
+
 /*	
 	TODO:
 	Construir L, el arreglo que contiene todos los codewords
@@ -185,12 +192,18 @@ bool DecodificadorLineal(const char* nombreArchivoEntrada, const char* nombreArc
 		int parteBaja = buff[0];
 		int parteAlta = buff[1];
 		
-		int dato1 = decodificarNibble(r, n, parteBaja);
-		int dato2 = decodificarNibble(r, n, parteAlta);
+		/*
+			Se ignora el bit mas significativo de cada byte porque
+			solo usamos 7 bits para la codificacion. En caso de que
+			el error se introduzca en ese bit.
+			
+		*/
+		int dato1 = decodificarNibble(r, n, parteBaja & ~0x80);
+		int dato2 = decodificarNibble(r, n, parteAlta & ~0x80);
 		
 		int corregido = (dato2 << 4) | dato1;
 		if(verboseFlag)
-			printf("Corregido final: %d = 0x%x\n", (dato2 << 4) | dato1, (dato2 << 4) | dato1);
+			printf("Corregido final: %d = 0x%x\n", corregido, corregido);
 		fwrite(&corregido, 1, 1, archivoSalida);
 	}
 	

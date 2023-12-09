@@ -10,7 +10,7 @@
 bool decodeFlag = false, verboseFlag = false;
 
 //TODO: esto es temporal, obtener r talvez como argumento y calcular
-// las demas variables en funcione de r.
+// las demas variables en funcion de r.
 const int r = 3; // paridad
 const int n = (1 << r) - 1; // 2^r - 1
 const int k = n-r; // 2^r - 1 - r
