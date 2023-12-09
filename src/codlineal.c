@@ -190,7 +190,7 @@ bool DecodificadorLineal(const char* nombreArchivoEntrada, const char* nombreArc
 		
 		int corregido = (dato2 << 4) | dato1;
 		if(verboseFlag)
-			printf("Corregido final: %d = 0x%x\n", (dato2 << 4) | dato1, (dato2 << 4) | dato1);
+			printf("Corregido final: %d = 0x%x\n", corregido, corregido);
 		fwrite(&corregido, 1, 1, archivoSalida);
 	}
 	
