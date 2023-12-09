@@ -2,12 +2,11 @@
 #define _HEAP_H   
 
 #include <stdlib.h>
-#include <string.h>
+#include "nodo.h"
 
-void min_heapify(int A[], int i, int size);
-int extract_min(int A[], int* size);
-void insert(int A[], int key, int* size);
-void decrease_key(int A[], int i, int key);
-void printArray(int array[], int size);
+void min_heapify(nodo** A, int i, int size);
+nodo* extract_min(nodo** A, int* size);
+void insert(nodo** A, nodo* key, int* size);
+void printArray(nodo** array, int size);
 
 #endif
