@@ -77,6 +77,15 @@ int decodificar(int r, int n, int p){
 	return decodificarDato(p, (r << k));
 }
 
+unsigned char construirL(int r, int n, int k){
+	int filas[r];
+	int numCodewords = (1 << k);
+	int L[numCodewords];
+	calcularFilas(filas, r, n);
+	
+	
+}
+
 int main(int argc, char** argv){
 	r = atoi(argv[1]); // delta
 	n = (1 << r) - 1; // 2^r - 1
