@@ -42,6 +42,6 @@ int main() {
   //LIBERACION DE MEMORIA DINAMICA DE LOS ELEMENTOS QUE HAYAN QUEDADO EN LA COLA
   for (int i = 0; i<heap_size; i++)
   {
-  	free(array[i]);
+  	free_nodo(array[i], NULL);
   }
 }
