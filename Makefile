@@ -15,7 +15,7 @@ endif
 
 all: huffman codlineal injectError
 
-huffman: huffman.c
+huffman: huffman.c nodo.c heap.c
 	$(CC) $(CFLAGS) -o $@ $^ $(LDFLAGS)
 	
 codlineal: codlineal.c
