@@ -193,9 +193,9 @@ bool DecodificadorLineal(const char* nombreArchivoEntrada, const char* nombreArc
 		int parteAlta = buff[1];
 		
 		/*
-			Se ignora el bit mas significativo de cada byte porque
-			solo usamos 7 bits para la codificacion. En caso de que
-			el error se introduzca en ese bit.
+			En caso de que el error se introduzca en
+			el bit mas significativo de cada byte, lo ignoramos porque
+			solo usamos 7 bits para la codificacion.
 			
 		*/
 		int dato1 = decodificarNibble(r, n, parteBaja & ~0x80);
