@@ -14,6 +14,7 @@ struct frecuencia{
 };
 
 bool verboseFlag = false, decompressFlag = false;
+//estas variables globales se requieren porque los datos de los nodos son apuntadores
 int datos_arbol[256];  
 frecuencia freqs_cola[256];
 
