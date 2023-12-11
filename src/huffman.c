@@ -321,7 +321,7 @@ bool HuffmanDecodificador(const char* nombreArchivo){
 	fclose(descFILE);
 	
 	free(buffer);
-  	
+  	return true;
 }
 
 bool CrearFrecuencias(const char* nombreArchivo){
