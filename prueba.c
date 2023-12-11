@@ -77,13 +77,31 @@ int decodificar(int r, int n, int p){
 	return decodificarDato(p, (r << k));
 }
 
-unsigned char construirL(int r, int n, int k){
+void construirL(int* Lsalida, int tam, int r, int n, int k){
 	int filas[r];
-	int numCodewords = (1 << k);
-	int L[numCodewords];
 	calcularFilas(filas, r, n);
-	
-	
+	for(int i = 0; i < r; ++i)
+		printf("F[%d] = %d\n", i, filas[i]);
+	int corr = (1 << (n-1));
+	int bitsDependientes[3];
+	int variablesDep[3];
+	int p = 0;
+	for(int j = 0; j < r; ++j){
+		for(int i = corr; i > 0; i = i >> 1){
+			if(filas[j] & i){
+				bitsDependientes[p] = i;
+				printf("i = %d = 0x%x, ", i, i);
+				printf("x_%d = ", i >> 4);
+				int num = filas[j] & (i-1);
+				variablesDep[p++] = num;
+				printf("num = %d = 0x%x\n", num, num);
+				break;
+			}
+		}
+	}
+	for(int i = 0; i < 16; ++i){
+		
+	}
 }
 
 int main(int argc, char** argv){
@@ -127,6 +145,10 @@ int main(int argc, char** argv){
 	int dato2 = decodificar(r, n, codigo2 ^ 4);
 	printf("dato1 = %d = 0x%x\n", dato1, dato1);
 	printf("Corregido final: %d = 0x%x\n", (dato2 << 4) | dato1, (dato2 << 4) | dato1);
+	
+	int numCodewords = (1 << k);
+	int Ltemp[numCodewords];
+	construirL(Ltemp, numCodewords, r, n, k);
 	/*
 	printf("Recibido: %d = 0x%x\n", p, p);
 	int filas[r];
