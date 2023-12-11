@@ -1,12 +1,5 @@
 #include"codlineal.h"
 
-/*
-	TODO: En la descodificacion y correccion de errores
-	no se recupera del todo el archivo si el error ocurre endif
-	el bit 7 de cada codeword, porque no es parte de ella y no se sabe como interpretarla.
-	Idea para solucionarlo, no incluir el bit mas significativo del byte.
-*/
-
 /*	
 	TODO:
 	Construir L, el arreglo que contiene todos los codewords
@@ -61,7 +54,7 @@ void calcularFilas(int* numt, int r, int n){
 	}
 }
 
-int decodificarNibble(int r, int n, int p){
+int decodificarNibble(int r, int n, int p, FILE* archivoReporte, int* nbyte){
 	#ifdef DEBUG
 	printf("Recibido: %d = 0x%x\n", p, p);
 	#endif
@@ -83,6 +76,26 @@ int decodificarNibble(int r, int n, int p){
 		corregido = p ^ (1 << (n-res));
 		if(verboseFlag)
 			printf("Corregido = %d\n", corregido);
+		/*
+			Escribimos en el archivo de reportes
+			 los errores encontrados
+		 */
+		char buff[256] = {0};
+		int printed;
+		printed = sprintf(buff, "Se encontro un error en el bit: %d del byte %x: ", n-res, (*nbyte)++);
+		// tenemos que obtener la representacion en binario
+		int t = 7;
+		for(int i = (1 << 7); i > 0; i = i >> 1, --t){
+			int bitObtenido = (p & i) >> t;
+			printed += sprintf(buff+printed, "%d", bitObtenido);
+		}
+		t = 7;
+		printed += sprintf(buff+printed, " vs ");
+		for(int i = (1 << 7); i > 0; i = i >> 1, --t){
+			int bitObtenido = (corregido & i) >> t;
+			printed  += sprintf(buff+printed, "%d", bitObtenido);
+		}
+		fprintf(archivoReporte, "%s\n", buff);
 		int decodificado = decodificarDato(corregido, (r << k));
 		if(decodificado == -1)
 			return corregido;
@@ -172,6 +185,13 @@ bool DecodificadorLineal(const char* nombreArchivoEntrada, const char* nombreArc
 		return false;
 	}
 	
+	FILE *archivoReporte = fopen("ReporteCorrecciones.txt", "w+");
+	if(!archivoReporte){
+		fprintf(stderr, "¡Error!, no se pudo abrir el archivo\n");
+		fclose(archivoEntrada);
+		fclose(archivoSalida);
+		return false;
+	}
 	/*
 	Nuestra palabra recibida es el archivo "comprimido" resultante del
 	programa huffman. Si le llamamos z a nuestro mensaje recibido
@@ -183,6 +203,7 @@ bool DecodificadorLineal(const char* nombreArchivoEntrada, const char* nombreArc
 	*/
 	unsigned char buff[2];
 	size_t ret;
+	int nbyte = 0;
 	while((ret = fread(&buff, 1, 2, archivoEntrada)) > 0){
 		if(verboseFlag)
 			printf("Decodificando:\n");
@@ -198,15 +219,15 @@ bool DecodificadorLineal(const char* nombreArchivoEntrada, const char* nombreArc
 			solo usamos 7 bits para la codificacion.
 			
 		*/
-		int dato1 = decodificarNibble(r, n, parteBaja & ~0x80);
-		int dato2 = decodificarNibble(r, n, parteAlta & ~0x80);
+		int dato1 = decodificarNibble(r, n, parteBaja & ~0x80, archivoReporte, &nbyte);
+		int dato2 = decodificarNibble(r, n, parteAlta & ~0x80, archivoReporte, &nbyte);
 		
 		int corregido = (dato2 << 4) | dato1;
 		if(verboseFlag)
 			printf("Corregido final: %d = 0x%x\n", corregido, corregido);
 		fwrite(&corregido, 1, 1, archivoSalida);
 	}
-	
+	fclose(archivoReporte);
 	fclose(archivoEntrada);
 	fclose(archivoSalida);
 	return true;
