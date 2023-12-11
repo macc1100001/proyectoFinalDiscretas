@@ -31,7 +31,6 @@ nodo* CrearArbol(void)
 {
 	nodo* cola_prio[256];
 	nodo* n;
-	//frecuencia freqs_cola[256];
 	
 	FILE* freqsFile = fopen("freqs.txt", "r");
 	if(!freqsFile){
@@ -42,90 +41,46 @@ nodo* CrearArbol(void)
 	int heap_size = 0, fr;
 	unsigned int byte;
    
+   //Se construye la cola de prioridad
   	while (fscanf(freqsFile, "%x %u", &byte, &fr) == 2)
   	{
    		if (fr>0)
    	  	{
    	  		freqs_cola[heap_size].num = fr;
    	  		freqs_cola[heap_size].byte = byte;
-   	  		//printf("byte: %x %d\n",byte, fr);
 			n = crear_nodo(freqs_cola+heap_size);
   			insert(cola_prio, n, &heap_size);
    	  	} 
     }
 	fclose(freqsFile);
 
-	/*
-	//VISUALIZACION DE LA COLA DE PRIORIDAD
+	#ifdef DEBUG
 	printf("Max-Heap cola_prio: ");
-	printcola_prio(cola_prio, heap_size);
-  
-  
-	  //EXTRACCION DEL PRIMER ELEMENTO
-	  nodo* min;
-	  int a = heap_size;
-	  for (int i = 0; i<a-1; i++)
-	  {
-		  min = extract_min(cola_prio, &heap_size);
-		  printf("After extracting element (%d): ", *((int*)min->datos));
-		  printcola_prio(cola_prio, heap_size);
-	  }
-
-	  min = extract_min(cola_prio, &heap_size);
-	  frecuencia prueba = *(frecuencia*)min->datos;
-	  printf("%u\n", prueba.byte);
-	  */
+	printArray(cola_prio, heap_size);
+	#endif
 	  
 	  
 	//ALGORITMO DE HUFFMAN
-	  
-	//int datos_arbol[256];  
-	int iterations = heap_size-1; //new variable because heap_size changes dinamically
+ 
+	int iterations = heap_size-1; //se copia el heap_size en una variable porque este cambia dinamicamente
 	for (int i = 0; i<iterations; i++)
 	{	
 		nodo* z = crear_nodo(NULL);
+		
 		z->izq = extract_min(cola_prio, &heap_size);
   		(z->izq)->ant = z;
-  		//printf("(IZQ Byte %d)\n", (*(frecuencia*)(z->izq)->datos).byte);
+
   		
   		z->der = extract_min(cola_prio, &heap_size);
   		(z->der)->ant = z;
-  		//printf("(DER Byte %d)\n", (*(frecuencia*)(z->der)->datos).byte);
   		
-  		//int x = *(long int*)((z->izq)->datos) + *(long int*)((z->der)->datos);
-  		datos_arbol[i] = *(int*)((z->izq)->datos) + *(int*)((z->der)->datos);
-  		//printf("%d\n",datos_arbol[i]);
-  		
-  		z->datos = datos_arbol+i; //HAY QUE PASARLE LA DIRECCION DE UNA VARIABLE (CHECAR DESPUES)
-  		
-  		//printf("(PADRE byte %d)\n", (*(frecuencia*)z->datos).byte);
-  		//printf("(Frec %d)\n", (*(frecuencia*)z->datos).num);
-  		//printf("hehe\n");
+  		datos_arbol[i] = *(int*)((z->izq)->datos) + *(int*)((z->der)->datos); //se suman las frecuencias de los nodos hijos
+  		z->datos = datos_arbol+i;
+  		 
   		insert(cola_prio, z, &heap_size);
   	}
-  	nodo* raiz = extract_min(cola_prio, &heap_size);
   	
-  	/*for (int i = 0; i<heap_size; i++)
-  	{
-  		free_nodo(cola_prio[i], NULL);
-  		printf("hola\n");
-  	}*/
-  	
-  	//printf("(Byte %d)\n", (*(frecuencia*)(raiz->der->der->izq)->datos).byte);
-  	//printf("(Frec %d)\n", (*(frecuencia*)(raiz->der->der->izq)->datos).num);
-  	
-  	/*
-  	for (unsigned char c = 0; c<255; c++)
-	{
-		char aux[256] = {0};
-		char codificado[256] = {0};
-		char* cod = Buscar(raiz, c, aux, codificado);
-		printf("EL CODIGO DE %x ES %s\n", c, codificado);
-	}
-  	
-	*/
-	
-	return raiz;
+  	return extract_min(cola_prio, &heap_size); //La funcion devuelve el apuntador al nodo raiz
 }
 
 bool HuffmanCodificador(const char* nombreArchivo){
@@ -133,20 +88,10 @@ bool HuffmanCodificador(const char* nombreArchivo){
 	// Esta funcion tiene que devolver false, si falla
 	// y true al final si todo se ejecuto de manera correcta, como ejemplo 
 	// esta la funcion CrearFrecuencias
-	
   	
-//CODIFICACION
+  	nodo* raiz = CrearArbol(); //Se obtiene el arbol para la codificacion de Huffman
   	
-  	nodo* raiz = CrearArbol();
-  	
-  	//strcpy(codificado, cod);
-  	//strncat(cod, codificado, 256);
-  	//strncat(cod, codificado, 256);
-  	
-  	//cadena = (unsigned char *)malloc(filelen*sizeof(char));
-  	//int newsize;
-  	
-  	
+  	#ifdef DEBUG
   	for (unsigned char c = 0; c<255; c++)
 	{
 		char aux[256] = {0};
@@ -158,6 +103,7 @@ bool HuffmanCodificador(const char* nombreArchivo){
 			printf("%x es: %s de longitud %d\n", c, cod, ln);
 		}
 	}
+	#endif
 	
 	FILE* fd = fopen(nombreArchivo, "r");
 	if(!fd){
@@ -178,14 +124,11 @@ bool HuffmanCodificador(const char* nombreArchivo){
 	
 	fclose(fd);
 	
-	
 	FILE* comprFILE = fopen("comprimido", "w+");
 	if(!comprFILE){
 		fprintf(stderr, "Error al crear el archivo de frecuencias\n");
 		return false;
 	}
-	
-	//filelen = 2;
 	
 	char aux[256] = {0};
 	char codificado[256] = {0};
@@ -195,8 +138,7 @@ bool HuffmanCodificador(const char* nombreArchivo){
 	
 	for (long i = 0; i<filelen; i++)
 	{
-		cod = Buscar(raiz, buffer[i], aux, codificado);
-		//printf("%ld\n",strlen(cod));
+		cod = Buscar(raiz, buffer[i], aux, codificado); //se obtiene el byte codificado como un string
 		cod_len += strlen(cod);
 		all_cods = (char*)realloc(all_cods,cod_len);
 		if (cod == NULL)
@@ -204,42 +146,30 @@ bool HuffmanCodificador(const char* nombreArchivo){
 	  		fprintf(stderr, "Error al comprimir el archivo\n");
 	  		return false;
 	  	}
-	  	strncat(all_cods, cod, cod_len);
-		//fwrite(cod , 1 , strlen(cod), comprFILE);
-		//printf("[%s]\n",cod);
-		//printf("%d\n",cod_len);
+	  	strncat(all_cods, cod, cod_len); //se concatena cada codificacion para guardarlos todos en un arreglo
 	}
 	
-	//printf("(%s)\n",all_cods[all_cods]);
-	//printf("%s\n", all_cods);
-	//printf("total length in bits %ld\n", strlen(all_cods));
+	#ifdef DEBUG
+	printf("%s\n", all_cods);
+	printf("total length in bits %ld\n", strlen(all_cods));
+	#endif
 	
 	unsigned char byte = 0;
 	int x, k;
 	
-	//strlen(all_cods)
+	//Procedimiento para convertir cada bit de all_cods en bytes reales (pues estos estan representados como cadenas de char)
 	for (unsigned long int i = 0; i < strlen(all_cods);i+=8)
 	{
 		k = 0;
 		for (unsigned long int j = i; j<i+8; j++)
 		{
 			x = all_cods[j] - '0';
-			//printf("%c, %d, ", cod[j], cod[j]);
-			//printf("%d %x\n",x, x);
 			byte |= (x&1) << k++;
 		}
-		//printf("%d %x\n", byte, byte);
 		fwrite(&byte, 1, 1, comprFILE);
 		byte = 0;
-		//printf("%x\n",byte);
-		//x = all_cods[i] - '0';
-		//printf("%d %x\n", x, x);
 	}
-	
-	//fwrite(cod , 1 , strlen(cod), comprFILE);
-	
 	free(buffer);
-
   	fclose(comprFILE);
   	
   	return true;
@@ -251,8 +181,7 @@ bool HuffmanDecodificador(const char* nombreArchivo){
 	// indicando si se pudo ejecutar de manera correcta el programa
 	//CODIFICACION
   
-   	nodo* raiz = CrearArbol();
-  	
+   	nodo* raiz = CrearArbol(); //Se obtiene el arbol para decodificar los bytes
   	
   	FILE* comprFILE = fopen(nombreArchivo, "r");
 	if(!comprFILE){
@@ -263,7 +192,6 @@ bool HuffmanDecodificador(const char* nombreArchivo){
 	unsigned char* buffer;
 	long filelen;
 
-	
 	//calcular longitud del archivo
 	fseek(comprFILE, 0, SEEK_END);
 	filelen = ftell(comprFILE);
@@ -272,10 +200,6 @@ bool HuffmanDecodificador(const char* nombreArchivo){
 	buffer = (unsigned char *)calloc(filelen+1,sizeof(char));
 	fread(buffer, filelen, 1, comprFILE);
 	fclose(comprFILE);
-	
-	//printf("%s",buffer);
-	
-	//filelen = 40;
 
 	FILE* descFILE = fopen("descomprimido", "w+");
 	if(!descFILE){
@@ -288,25 +212,14 @@ bool HuffmanDecodificador(const char* nombreArchivo){
 	temp = raiz;
 	char compara;
 	int k;
-	//filelen = 10;
-	//printf("filelen = %ld\n", filelen);
-	//printf("buffer = %x\n", buffer, buffer);
-	//unsigned long int t = 0;
+
+	//Procedimiento para leer los bits (extraidos de cada byte) y buscar en el arbol a que hoja (otro byte) pertenecen
 	for (unsigned long i = 0; i<filelen; i++)
-	{
-		//byte |= (x&1) << k++;
-		//compara |= (buffer[i]&1) >> k++;
-		//printf("%c\n", buffer[i]);
-		
+	{	
 		k = 0;
-		//int t = 7;
 		for ( int j = 0; j<8; j++)
 		{
-			//t += j;
-			//printf("buff = %d %x\n", buffer[j], buffer[j]);
 			compara = ( (buffer[i] >> k++)  & 1 );
-			
-			//printf("%d %x\n", compara, compara);
 			
 			if (compara == 1)
 			{
@@ -314,8 +227,6 @@ bool HuffmanDecodificador(const char* nombreArchivo){
 				if (temp->der == NULL && temp->izq == NULL)
 				{
 					byte = (*(frecuencia*)temp->datos).byte;
-					//buffer[i] = byte;
-					//printf("(Byte 0x%x)\n", byte);
 					fwrite(&byte , 1 , 1, descFILE);
 					temp = raiz;
 				}
@@ -329,8 +240,6 @@ bool HuffmanDecodificador(const char* nombreArchivo){
 					if (temp->der == NULL && temp->izq == NULL)
 					{
 						byte = (*(frecuencia*)temp->datos).byte;
-						//buffer[i] = byte;
-						//printf("(Byte %d)\n", byte);
 						fwrite(&byte , 1 , 1, descFILE);
 						temp = raiz;
 					}
@@ -339,22 +248,11 @@ bool HuffmanDecodificador(const char* nombreArchivo){
 				else
 					break;
 			}
-		
 		}
-	
-	
-		//char aux[256] = {0};
-		//*char codificado[256] = {0};
-		//*cod = Buscar(raiz, buffer[i], aux, codificado);
-		//*fwrite(cod , 1 , strlen(cod), comprFILE);
 	}
-	//printf("t = %ld\n", t);
-	
-	//fwrite(buffer , 1 , filelen, descFILE);
-	
 	fclose(descFILE);
-	
 	free(buffer);
+	
   	return true;
 }
 

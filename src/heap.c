@@ -1,6 +1,6 @@
 #include "heap.h"
 #include<stdio.h>
-#define parent(i) ( (i - 1) / 2) //minus one because index start in 0 but size cannot be lesser than 2
+#define parent(i) ( (i - 1) / 2) //menos uno porque los indices empiezan en 0 pero el heap_size no puede ser menos de 2
 #define left(i) (2 * i + 1)
 #define right(i) (2 * i + 2)
 
@@ -70,7 +70,7 @@ void insert(nodo** A, nodo* key, int* size)
 	}
 }
 
-//AUXILIAR BORRAR DESPUES (O USARLA PARA VERBOOSE)
+//Auxiliar para imprimir la cola de prioridad
 void printArray(nodo** array, int size) {
   for (int i = 0; i < size; ++i)
     printf("%d ", *((int*)array[i]->datos));
