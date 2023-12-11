@@ -103,6 +103,7 @@ int decodificarNibble(int r, int n, int p, FILE* archivoReporte, int* nbyte){
 	}
 	if(verboseFlag)
 		printf("No errores\n");
+	(*nbyte)++;
 	return decodificarDato(p, (r << k));
 }
 
