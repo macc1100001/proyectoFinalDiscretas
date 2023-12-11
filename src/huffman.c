@@ -48,7 +48,7 @@ nodo* CrearArbol(void)
    	  	{
    	  		freqs_cola[heap_size].num = fr;
    	  		freqs_cola[heap_size].byte = byte;
-   	  		//printf("byte: %d\n",byte);
+   	  		//printf("byte: %x %d\n",byte, fr);
 			n = crear_nodo(freqs_cola+heap_size);
   			insert(cola_prio, n, &heap_size);
    	  	} 
@@ -137,23 +137,7 @@ bool HuffmanCodificador(const char* nombreArchivo){
   	
 //CODIFICACION
   	
-  	unsigned char key = 32; //ejemplo
-  	char aux[256] = {0};
-  	char* cod;
-  	
-  	char codificado[256];
-  	
   	nodo* raiz = CrearArbol();
-  	
-  	cod = Buscar(raiz, key, aux, codificado);
-  	
-  	if (cod != NULL)
-  		printf("1 EL CODIGO DE %x ES %s\n", key, cod);
-  	else
-  	{
-  		fprintf(stderr, "Error al comprimir el archivo\n");
-  		return false;
-  	}
   	
   	//strcpy(codificado, cod);
   	//strncat(cod, codificado, 256);
@@ -162,19 +146,18 @@ bool HuffmanCodificador(const char* nombreArchivo){
   	//cadena = (unsigned char *)malloc(filelen*sizeof(char));
   	//int newsize;
   	
-  	/*
+  	
   	for (unsigned char c = 0; c<255; c++)
 	{
 		char aux[256] = {0};
 		char codificado[256] = {0};
-		cod = Buscar(raiz, c, aux, codificado);
+		char* cod = Buscar(raiz, c, aux, codificado);
 		if (cod != NULL)
 		{
 			int ln = strlen(cod);
 			printf("%x es: %s de longitud %d\n", c, cod, ln);
 		}
 	}
-	*/
 	
 	FILE* fd = fopen(nombreArchivo, "r");
 	if(!fd){
@@ -191,7 +174,7 @@ bool HuffmanCodificador(const char* nombreArchivo){
 	rewind(fd);
 	
 	buffer = (unsigned char *)calloc(filelen+1,sizeof(char));
-	fread(buffer, filelen, 1, fd);
+	fread(buffer, 1, filelen, fd);
 	
 	fclose(fd);
 	
@@ -202,15 +185,55 @@ bool HuffmanCodificador(const char* nombreArchivo){
 		return false;
 	}
 	
+	//filelen = 2;
+	
+	char aux[256] = {0};
+	char codificado[256] = {0};
+	char* all_cods = (char*)calloc(1, sizeof(char));
+	int cod_len;
+	char* cod;
+	
 	for (long i = 0; i<filelen; i++)
 	{
-		//printf("%u ", buffer[i]);
-		char aux[256] = {0};
-		char codificado[256] = {0};
 		cod = Buscar(raiz, buffer[i], aux, codificado);
-		fwrite(cod , 1 , strlen(cod), comprFILE);
-		//printf("%s\n",cod);
-		//printf("%ld\n",sizeof(cod));
+		//printf("%ld\n",strlen(cod));
+		cod_len += strlen(cod);
+		all_cods = (char*)realloc(all_cods,cod_len);
+		if (cod == NULL)
+	  	{
+	  		fprintf(stderr, "Error al comprimir el archivo\n");
+	  		return false;
+	  	}
+	  	strncat(all_cods, cod, cod_len);
+		//fwrite(cod , 1 , strlen(cod), comprFILE);
+		//printf("[%s]\n",cod);
+		//printf("%d\n",cod_len);
+	}
+	
+	//printf("(%s)\n",all_cods[all_cods]);
+	//printf("%s\n", all_cods);
+	//printf("total length in bits %ld\n", strlen(all_cods));
+	
+	unsigned char byte = 0;
+	int x, k;
+	
+	//strlen(all_cods)
+	for (unsigned long int i = 0; i < strlen(all_cods);i+=8)
+	{
+		k = 0;
+		for (unsigned long int j = i; j<i+8; j++)
+		{
+			x = all_cods[j] - '0';
+			//printf("%c, %d, ", cod[j], cod[j]);
+			//printf("%d %x\n",x, x);
+			byte |= (x&1) << k++;
+		}
+		//printf("%d %x\n", byte, byte);
+		fwrite(&byte, 1, 1, comprFILE);
+		byte = 0;
+		//printf("%x\n",byte);
+		//x = all_cods[i] - '0';
+		//printf("%d %x\n", x, x);
 	}
 	
 	//fwrite(cod , 1 , strlen(cod), comprFILE);
@@ -228,15 +251,7 @@ bool HuffmanDecodificador(const char* nombreArchivo){
 	// indicando si se pudo ejecutar de manera correcta el programa
 	//CODIFICACION
   
-  	
-  	
-  	unsigned char key = 32; //ejemplo
-  	char aux[256] = {0};
-  	char* cod;	
-  	char codificado[256];
-  
-  	
-  	nodo* raiz = CrearArbol();
+   	nodo* raiz = CrearArbol();
   	
   	
   	FILE* comprFILE = fopen(nombreArchivo, "r");
@@ -271,42 +286,60 @@ bool HuffmanDecodificador(const char* nombreArchivo){
 	nodo* temp;
 	unsigned char byte;
 	temp = raiz;
-	
-	for (long i = 0; i<filelen; i++)
+	char compara;
+	int k;
+	//filelen = 10;
+	//printf("filelen = %ld\n", filelen);
+	//printf("buffer = %x\n", buffer, buffer);
+	//unsigned long int t = 0;
+	for (unsigned long i = 0; i<filelen; i++)
 	{
-		
+		//byte |= (x&1) << k++;
+		//compara |= (buffer[i]&1) >> k++;
 		//printf("%c\n", buffer[i]);
 		
-		if ((char)buffer[i] == '1')
+		k = 0;
+		//int t = 7;
+		for ( int j = 0; j<8; j++)
 		{
-			temp = temp->der;
-			if (temp->der == NULL && temp->izq == NULL)
+			//t += j;
+			//printf("buff = %d %x\n", buffer[j], buffer[j]);
+			compara = ( (buffer[i] >> k++)  & 1 );
+			
+			//printf("%d %x\n", compara, compara);
+			
+			if (compara == 1)
 			{
-				byte = (*(frecuencia*)temp->datos).byte;
-				//buffer[i] = byte;
-				printf("(Byte %d)\n", byte);
-				fwrite(&byte , 1 , 1, descFILE);
-				temp = raiz;
-			}
-		}
-		
-		else
-		{
-			if ((char)buffer[i] == '0')
-			{
-				temp = temp->izq;
+				temp = temp->der;
 				if (temp->der == NULL && temp->izq == NULL)
 				{
 					byte = (*(frecuencia*)temp->datos).byte;
 					//buffer[i] = byte;
-					printf("(Byte %d)\n", byte);
+					//printf("(Byte 0x%x)\n", byte);
 					fwrite(&byte , 1 , 1, descFILE);
 					temp = raiz;
 				}
 			}
 			
 			else
-				break;
+			{
+				if (compara == 0)
+				{
+					temp = temp->izq;
+					if (temp->der == NULL && temp->izq == NULL)
+					{
+						byte = (*(frecuencia*)temp->datos).byte;
+						//buffer[i] = byte;
+						//printf("(Byte %d)\n", byte);
+						fwrite(&byte , 1 , 1, descFILE);
+						temp = raiz;
+					}
+				}
+				
+				else
+					break;
+			}
+		
 		}
 	
 	
@@ -315,6 +348,7 @@ bool HuffmanDecodificador(const char* nombreArchivo){
 		//*cod = Buscar(raiz, buffer[i], aux, codificado);
 		//*fwrite(cod , 1 , strlen(cod), comprFILE);
 	}
+	//printf("t = %ld\n", t);
 	
 	//fwrite(buffer , 1 , filelen, descFILE);
 	
