@@ -252,12 +252,14 @@ int main(int argc, char** argv){
 	}
 	
 	if(!argv[optind]){
-		fprintf(stderr,"Uso: %s [OPCIONES] ARCHIVO\n\
-El argumento ARCHIVO es el archivo a codificar. \
-El programa por defecto funciona en modo codificacion\n\
+		fprintf(stderr,"Uso: %s [OPCIONES] ARCHIVO\n\n\
+El argumento ARCHIVO es la ruta al archivo a codificar. \
+El programa por defecto funciona en modo codificacion.\n\
+\n\
 Opciones:\n\
--d	El programa se ejecuta en modo de decodificacion\n\
--v	El programa escupe mas informacion en la consola\n", argv[0]);
+-d	El programa se ejecuta en modo de decodificacion, y ARCHIVO es la ruta al archivo a decodificar que se decodifica.\n\
+-v	El programa escupe mas informacion en la consola.\n\
+-f	El nombre del archivo decodificado. Por defecto el archivo decodificado se llama \"decodificado\".\n", argv[0]);
 		return EXIT_FAILURE;
 	}
 	
