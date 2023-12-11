@@ -1,16 +1,327 @@
 #include "huffman.h"
+#include "heap.h"
+#include "nodo.h"
+
+char* Buscar(nodo* padre, unsigned char key, char* temp, char* codificado)
+{	
+	if (padre == NULL)
+		return NULL;
+	
+	if ( (*(frecuencia*)padre->datos).byte == key && padre->der == NULL && padre->izq == NULL)
+			return strcpy(codificado, temp);
+
+	else
+	{
+		char subcod1[256]={0}, subcod2[256]={0};
+		char *aux;
+		strcpy(subcod1, temp);
+		strcpy(subcod2, temp);
+
+		aux = Buscar(padre->der, key, strncat(subcod1, "1", 2), codificado);
+		
+		if (aux != NULL)
+			return aux;
+		else
+			return Buscar(padre->izq, key, strncat(subcod2, "0", 2), codificado);
+	}
+}
+
+
+nodo* CrearArbol(void)
+{
+	nodo* cola_prio[256];
+	nodo* n;
+	//frecuencia freqs_cola[256];
+	
+	FILE* freqsFile = fopen("freqs.txt", "r");
+	if(!freqsFile){
+		fprintf(stderr, "Error al leer el archivo de frecuencias\n");
+		return false;
+	}
+	
+	int heap_size = 0, fr;
+	unsigned int byte;
+   
+  	while (fscanf(freqsFile, "%x %u", &byte, &fr) == 2)
+  	{
+   		if (fr>0)
+   	  	{
+   	  		freqs_cola[heap_size].num = fr;
+   	  		freqs_cola[heap_size].byte = byte;
+   	  		//printf("byte: %d\n",byte);
+			n = crear_nodo(freqs_cola+heap_size);
+  			insert(cola_prio, n, &heap_size);
+   	  	} 
+    }
+	fclose(freqsFile);
+
+	/*
+	//VISUALIZACION DE LA COLA DE PRIORIDAD
+	printf("Max-Heap cola_prio: ");
+	printcola_prio(cola_prio, heap_size);
+  
+  
+	  //EXTRACCION DEL PRIMER ELEMENTO
+	  nodo* min;
+	  int a = heap_size;
+	  for (int i = 0; i<a-1; i++)
+	  {
+		  min = extract_min(cola_prio, &heap_size);
+		  printf("After extracting element (%d): ", *((int*)min->datos));
+		  printcola_prio(cola_prio, heap_size);
+	  }
+
+	  min = extract_min(cola_prio, &heap_size);
+	  frecuencia prueba = *(frecuencia*)min->datos;
+	  printf("%u\n", prueba.byte);
+	  */
+	  
+	  
+	//ALGORITMO DE HUFFMAN
+	  
+	//int datos_arbol[256];  
+	int iterations = heap_size-1; //new variable because heap_size changes dinamically
+	for (int i = 0; i<iterations; i++)
+	{	
+		nodo* z = crear_nodo(NULL);
+		z->izq = extract_min(cola_prio, &heap_size);
+  		(z->izq)->ant = z;
+  		//printf("(IZQ Byte %d)\n", (*(frecuencia*)(z->izq)->datos).byte);
+  		
+  		z->der = extract_min(cola_prio, &heap_size);
+  		(z->der)->ant = z;
+  		//printf("(DER Byte %d)\n", (*(frecuencia*)(z->der)->datos).byte);
+  		
+  		//int x = *(long int*)((z->izq)->datos) + *(long int*)((z->der)->datos);
+  		datos_arbol[i] = *(int*)((z->izq)->datos) + *(int*)((z->der)->datos);
+  		//printf("%d\n",datos_arbol[i]);
+  		
+  		z->datos = datos_arbol+i; //HAY QUE PASARLE LA DIRECCION DE UNA VARIABLE (CHECAR DESPUES)
+  		
+  		//printf("(PADRE byte %d)\n", (*(frecuencia*)z->datos).byte);
+  		//printf("(Frec %d)\n", (*(frecuencia*)z->datos).num);
+  		//printf("hehe\n");
+  		insert(cola_prio, z, &heap_size);
+  	}
+  	nodo* raiz = extract_min(cola_prio, &heap_size);
+  	
+  	/*for (int i = 0; i<heap_size; i++)
+  	{
+  		free_nodo(cola_prio[i], NULL);
+  		printf("hola\n");
+  	}*/
+  	
+  	//printf("(Byte %d)\n", (*(frecuencia*)(raiz->der->der->izq)->datos).byte);
+  	//printf("(Frec %d)\n", (*(frecuencia*)(raiz->der->der->izq)->datos).num);
+  	
+  	/*
+  	for (unsigned char c = 0; c<255; c++)
+	{
+		char aux[256] = {0};
+		char codificado[256] = {0};
+		char* cod = Buscar(raiz, c, aux, codificado);
+		printf("EL CODIGO DE %x ES %s\n", c, codificado);
+	}
+  	
+	*/
+	
+	return raiz;
+}
 
 bool HuffmanCodificador(const char* nombreArchivo){
 	// TODO: aqui se hace la parte codificadora, que es la opcion por defecto
 	// Esta funcion tiene que devolver false, si falla
 	// y true al final si todo se ejecuto de manera correcta, como ejemplo 
 	// esta la funcion CrearFrecuencias
+	
+  	
+//CODIFICACION
+  	
+  	unsigned char key = 32; //ejemplo
+  	char aux[256] = {0};
+  	char* cod;
+  	
+  	char codificado[256];
+  	
+  	nodo* raiz = CrearArbol();
+  	
+  	cod = Buscar(raiz, key, aux, codificado);
+  	
+  	if (cod != NULL)
+  		printf("1 EL CODIGO DE %x ES %s\n", key, cod);
+  	else
+  	{
+  		fprintf(stderr, "Error al comprimir el archivo\n");
+  		return false;
+  	}
+  	
+  	//strcpy(codificado, cod);
+  	//strncat(cod, codificado, 256);
+  	//strncat(cod, codificado, 256);
+  	
+  	//cadena = (unsigned char *)malloc(filelen*sizeof(char));
+  	//int newsize;
+  	
+  	/*
+  	for (unsigned char c = 0; c<255; c++)
+	{
+		char aux[256] = {0};
+		char codificado[256] = {0};
+		cod = Buscar(raiz, c, aux, codificado);
+		if (cod != NULL)
+		{
+			int ln = strlen(cod);
+			printf("%x es: %s de longitud %d\n", c, cod, ln);
+		}
+	}
+	*/
+	
+	FILE* fd = fopen(nombreArchivo, "r");
+	if(!fd){
+		fprintf(stderr, "Error al intentar abrir archivo\n");
+		return false;
+	}
+		
+	unsigned char* buffer;
+	long filelen;
+	
+	//calcular longitud del archivo
+	fseek(fd, 0, SEEK_END);
+	filelen = ftell(fd);
+	rewind(fd);
+	
+	buffer = (unsigned char *)calloc(filelen+1,sizeof(char));
+	fread(buffer, filelen, 1, fd);
+	
+	fclose(fd);
+	
+	
+	FILE* comprFILE = fopen("comprimido", "w+");
+	if(!comprFILE){
+		fprintf(stderr, "Error al crear el archivo de frecuencias\n");
+		return false;
+	}
+	
+	for (long i = 0; i<filelen; i++)
+	{
+		//printf("%u ", buffer[i]);
+		char aux[256] = {0};
+		char codificado[256] = {0};
+		cod = Buscar(raiz, buffer[i], aux, codificado);
+		fwrite(cod , 1 , strlen(cod), comprFILE);
+		//printf("%s\n",cod);
+		//printf("%ld\n",sizeof(cod));
+	}
+	
+	//fwrite(cod , 1 , strlen(cod), comprFILE);
+	
+	free(buffer);
+
+  	fclose(comprFILE);
+  	
+  	return true;
 }
 
 bool HuffmanDecodificador(const char* nombreArchivo){
 	// TODO: parte decodificadora se hace aqui
 	// Lo mismo que la funcion de arriba, se debe de devolver un booleano
 	// indicando si se pudo ejecutar de manera correcta el programa
+	//CODIFICACION
+  
+  	
+  	
+  	unsigned char key = 32; //ejemplo
+  	char aux[256] = {0};
+  	char* cod;	
+  	char codificado[256];
+  
+  	
+  	nodo* raiz = CrearArbol();
+  	
+  	
+  	FILE* comprFILE = fopen(nombreArchivo, "r");
+	if(!comprFILE){
+		fprintf(stderr, "Error al intentar abrir archivo\n");
+		return false;
+	}
+		
+	unsigned char* buffer;
+	long filelen;
+
+	
+	//calcular longitud del archivo
+	fseek(comprFILE, 0, SEEK_END);
+	filelen = ftell(comprFILE);
+	rewind(comprFILE);
+	
+	buffer = (unsigned char *)calloc(filelen+1,sizeof(char));
+	fread(buffer, filelen, 1, comprFILE);
+	fclose(comprFILE);
+	
+	//printf("%s",buffer);
+	
+	//filelen = 40;
+
+	FILE* descFILE = fopen("descomprimido", "w+");
+	if(!descFILE){
+		fprintf(stderr, "Error al crear el archivo de frecuencias\n");
+		return false;
+	}
+  		
+	nodo* temp;
+	unsigned char byte;
+	temp = raiz;
+	
+	for (long i = 0; i<filelen; i++)
+	{
+		
+		//printf("%c\n", buffer[i]);
+		
+		if ((char)buffer[i] == '1')
+		{
+			temp = temp->der;
+			if (temp->der == NULL && temp->izq == NULL)
+			{
+				byte = (*(frecuencia*)temp->datos).byte;
+				//buffer[i] = byte;
+				printf("(Byte %d)\n", byte);
+				fwrite(&byte , 1 , 1, descFILE);
+				temp = raiz;
+			}
+		}
+		
+		else
+		{
+			if ((char)buffer[i] == '0')
+			{
+				temp = temp->izq;
+				if (temp->der == NULL && temp->izq == NULL)
+				{
+					byte = (*(frecuencia*)temp->datos).byte;
+					//buffer[i] = byte;
+					printf("(Byte %d)\n", byte);
+					fwrite(&byte , 1 , 1, descFILE);
+					temp = raiz;
+				}
+			}
+			
+			else
+				break;
+		}
+	
+	
+		//char aux[256] = {0};
+		//*char codificado[256] = {0};
+		//*cod = Buscar(raiz, buffer[i], aux, codificado);
+		//*fwrite(cod , 1 , strlen(cod), comprFILE);
+	}
+	
+	//fwrite(buffer , 1 , filelen, descFILE);
+	
+	fclose(descFILE);
+	
+	free(buffer);
+  	
 }
 
 bool CrearFrecuencias(const char* nombreArchivo){
